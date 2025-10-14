@@ -205,3 +205,42 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# AWS credentials and config
+.aws/
+aws-credentials.json
+credentials.json
+
+# AgentCore specific
+.bedrock_agentcore/
+.bedrock_agentcore.yaml
+gateway_config.json
+agent_result.json
+
+# Environment variables
+.env.local
+.env.production
+
+# Terraform (if used)
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+
+# CloudFormation outputs
+outputs.json
+stack-outputs.json
+
+# Logs
+logs/
+
+# IDE
+.vscode/settings.json
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.zip
