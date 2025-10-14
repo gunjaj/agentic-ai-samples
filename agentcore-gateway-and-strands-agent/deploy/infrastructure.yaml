@@ -1,0 +1,315 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Standard AWS resources for Strands Agent'
+ 
+Parameters:
+  TagValue:
+    Type: String
+    Default: 'agentcore-gateway-and-strands-agent'
+  TestUserPassword:
+    Type: String
+    NoEcho: true
+    Default: 'TempPass123!'
+    Description: 'Password for test user (change in production)'
+ 
+Resources:
+  # Cognito User Pool
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: 'agentcore-strands-users'
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 12
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+      MfaConfiguration: 'OFF'
+      UserPoolTags:
+        example: !Ref TagValue
+ 
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: 'agentcore-strands-client'
+      UserPoolId: !Ref UserPool
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+ 
+  # IAM Roles
+  GatewayRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: 'AgentCoreGatewayRole'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: bedrock.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: 'GatewayLambdaInvokePolicy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource:
+                  - !GetAtt CalculatorFunction.Arn
+                  - !GetAtt WeatherFunction.Arn
+      Tags:
+        - Key: example
+          Value: !Ref TagValue
+ 
+  # AgentCore Runtime Execution Role
+  AgentExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: 'StrandsAgentExecutionRole'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: bedrock-agentcore.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: 'AgentExecutionPolicy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - bedrock:InvokeModel
+                  - bedrock:InvokeModelWithResponseStream
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - ecr:GetAuthorizationToken
+                  - ecr:BatchGetImage
+                  - ecr:GetDownloadUrlForLayer
+                Resource: '*'
+              - Effect: Allow
+                Action: ssm:GetParameter
+                Resource:
+                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/strands-agent/cognito/user-pool-id'
+                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/strands-agent/cognito/client-id'
+                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/strands-agent/config/region'
+                  - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/strands-agent/gateway/gateway-url'
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Ref TestUserSecret
+              - Effect: Allow
+                Action: cognito-idp:AdminInitiateAuth
+                Resource: !GetAtt UserPool.Arn
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+      Tags:
+        - Key: example
+          Value: !Ref TagValue
+ 
+  # Bedrock Model Invocation Logging Role
+  BedrockLoggingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: 'AmazonBedrockExecutionRoleForModelInvocationLogging'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: bedrock.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: 'BedrockLoggingPolicy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: 'arn:aws:logs:*:*:log-group:/aws/bedrock/modelinvocations*'
+      Tags:
+        - Key: example
+          Value: !Ref TagValue
+ 
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: 'StrandsLambdaExecutionRole'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Tags:
+        - Key: example
+          Value: !Ref TagValue
+ 
+  # Lambda Functions
+  CalculatorFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: 'strands-calculator'
+      Runtime: 'python3.11'
+      Handler: 'index.lambda_handler'
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import json
+ 
+          def lambda_handler(event, context):
+              try:
+                  # Try multiple parameter formats
+                  expression = None
+                  
+                  # Direct parameter
+                  if 'expression' in event:
+                      expression = event['expression']
+                  
+                  # Body parameter
+                  elif 'body' in event:
+                      if isinstance(event['body'], str):
+                          body = json.loads(event['body'])
+                      else:
+                          body = event['body']
+                      expression = body.get('expression')
+                  
+                  # Query parameters
+                  elif 'queryStringParameters' in event and event['queryStringParameters']:
+                      expression = event['queryStringParameters'].get('expression')
+                  
+                  if not expression:
+                      return {
+                          'statusCode': 400,
+                          'body': json.dumps({'error': f'Missing expression parameter. Event: {json.dumps(event)}'})
+                      }
+                  
+                  # Safe calculation
+                  result = eval(expression, {"__builtins__": {}}, {})
+                  
+                  return {
+                      'statusCode': 200,
+                      'body': json.dumps({
+                          'result': f"The result of {expression} is {result}"
+                      })
+                  }
+                  
+              except Exception as e:
+                  return {
+                      'statusCode': 500,
+                      'body': json.dumps({'error': f"Calculation error: {str(e)}"})
+                  }
+      Tags:
+        - Key: example
+          Value: !Ref TagValue
+ 
+  WeatherFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: 'strands-weather'
+      Runtime: 'python3.11'
+      Handler: 'index.lambda_handler'
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import json
+ 
+          def lambda_handler(event, context):
+              try:
+                  location = event.get('location', 'your area')
+                  
+                  return {'result': f"Weather for {location}: 72°F, Sunny, Humidity: 45%"}
+                  
+              except Exception as e:
+                  return {'error': f"Weather error: {str(e)}"}
+      Tags:
+        - Key: example
+          Value: !Ref TagValue
+ 
+  # Parameter Store
+  CognitoUserPoolIdParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: '/strands-agent/cognito/user-pool-id'
+      Type: String
+      Value: !Ref UserPool
+ 
+  CognitoClientIdParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: '/strands-agent/cognito/client-id'
+      Type: String
+      Value: !Ref UserPoolClient
+ 
+  RegionParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: '/strands-agent/config/region'
+      Type: String
+      Value: !Ref AWS::Region
+ 
+  # Secrets Manager
+  TestUserSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: 'strands-agent/test-user'
+      Description: 'Test user credentials for Strands Agent'
+      SecretString: !Sub '{"username":"testuser","password":"${TestUserPassword}"}'
+      Tags:
+        - Key: example
+          Value: !Ref TagValue
+ 
+  # Client IAM Policy
+  ClientPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: 'StrandsAgentClientPolicy'
+      Description: 'Policy for Strands Agent client access'
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: ssm:GetParameter
+            Resource:
+              - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/strands-agent/cognito/user-pool-id'
+              - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/strands-agent/cognito/client-id'
+              - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/strands-agent/config/region'
+              - !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/strands-agent/agent/agent-url'
+          - Effect: Allow
+            Action: secretsmanager:GetSecretValue
+            Resource: !Ref TestUserSecret
+          - Effect: Allow
+            Action: cognito-idp:AdminInitiateAuth
+            Resource: !GetAtt UserPool.Arn
+            Condition:
+              StringEquals:
+                'cognito-idp:username': 'testuser'
+ 
+Outputs:
+  UserPoolId:
+    Value: !Ref UserPool
+  ClientId:
+    Value: !Ref UserPoolClient
+  GatewayRoleArn:
+    Value: !GetAtt GatewayRole.Arn
+  AgentExecutionRoleArn:
+    Value: !GetAtt AgentExecutionRole.Arn
+  BedrockLoggingRoleArn:
+    Value: !GetAtt BedrockLoggingRole.Arn
+  CalculatorFunctionArn:
+    Value: !GetAtt CalculatorFunction.Arn
+  WeatherFunctionArn:
+    Value: !GetAtt WeatherFunction.Arn
