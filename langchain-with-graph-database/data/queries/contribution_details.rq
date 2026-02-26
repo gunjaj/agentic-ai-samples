@@ -1,0 +1,11 @@
+# queries/contributions_detail.rq
+PREFIX pen: <https://example.com/ontology/pension-insurance#>
+SELECT ?contrib ?type ?by ?acct ?amt ?dt WHERE {
+  ?contrib a pen:Contribution ;
+           pen:contributedBy ?by ;
+           pen:contributionToAccount ?acct ;
+           pen:contributionAmount ?amt ;
+           pen:contributionDate ?dt .
+  OPTIONAL { ?contrib a ?type . }
+}
+ORDER BY ?dt ?contrib

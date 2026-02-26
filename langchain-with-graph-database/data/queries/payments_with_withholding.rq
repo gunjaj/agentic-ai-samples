@@ -1,0 +1,15 @@
+# queries/payments_with_withholding.rq
+PREFIX pen: <https://example.com/ontology/pension-insurance#>
+SELECT ?payment ?payee ?gross ?dt ?withheld ?jur WHERE {
+  ?payment a pen:Payment ;
+           pen:paymentTo ?payee ;
+           pen:paymentAmount ?gross ;
+           pen:paymentDate ?dt .
+  OPTIONAL {
+    ?w a pen:TaxWithholding ;
+       pen:withholdingForPayment ?payment ;
+       pen:withholdingAmount ?withheld ;
+       pen:withholdingJurisdiction ?jur .
+  }
+}
+ORDER BY ?dt ?payment

@@ -1,0 +1,305 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix pen:  <https://example.com/ontology/pension-insurance#> .
+@prefix ex:   <https://example.com/data/pension/> .
+
+#################################################################
+# Reference / Identifiers
+#################################################################
+
+ex:idSponsorAcme a pen:Identifier ; pen:identifierType "EIN" ; pen:identifierValue "12-3456789" .
+ex:idAdminPrime a pen:Identifier ; pen:identifierType "ADMIN_ID" ; pen:identifierValue "ADM-1001" .
+ex:idTrustCo    a pen:Identifier ; pen:identifierType "TRUST_ID" ; pen:identifierValue "TRUST-77" .
+ex:idInsureCo   a pen:Identifier ; pen:identifierType "NAIC" ; pen:identifierValue "99999" .
+
+ex:idPlan401k   a pen:Identifier ; pen:identifierType "PLAN_ID" ; pen:identifierValue "ACME-401K-001" .
+ex:idPlanDB     a pen:Identifier ; pen:identifierType "PLAN_ID" ; pen:identifierValue "ACME-DB-001" .
+
+ex:idMemberAlice a pen:Identifier ; pen:identifierType "MEMBER_ID" ; pen:identifierValue "M-0001" .
+ex:idMemberBob   a pen:Identifier ; pen:identifierType "MEMBER_ID" ; pen:identifierValue "M-0002" .
+ex:idMemberCara  a pen:Identifier ; pen:identifierType "MEMBER_ID" ; pen:identifierValue "M-0003" .
+
+#################################################################
+# Parties
+#################################################################
+
+ex:AcmeCorp a pen:PlanSponsor ;
+  pen:hasIdentifier ex:idSponsorAcme .
+
+ex:PrimeAdmin a pen:Administrator ;
+  pen:hasIdentifier ex:idAdminPrime .
+
+ex:TrustCo a pen:Trustee ;
+  pen:hasIdentifier ex:idTrustCo .
+
+ex:InsureCo a pen:Insurer ;
+  pen:hasIdentifier ex:idInsureCo .
+
+# Members
+ex:Alice a pen:Member ; pen:hasIdentifier ex:idMemberAlice .
+ex:Bob   a pen:Member ; pen:hasIdentifier ex:idMemberBob .
+ex:Cara  a pen:Member ; pen:hasIdentifier ex:idMemberCara .
+
+# Beneficiaries
+ex:Dan a pen:Beneficiary ;
+  pen:hasIdentifier [ a pen:Identifier ; pen:identifierType "PERSON_ID" ; pen:identifierValue "B-010" ] .
+ex:Eve a pen:Beneficiary ;
+  pen:hasIdentifier [ a pen:Identifier ; pen:identifierType "PERSON_ID" ; pen:identifierValue "B-011" ] .
+
+#################################################################
+# Rules / Regulations
+#################################################################
+
+ex:EligibilityRule_A a pen:EligibilityRule ; pen:ruleText "Eligible after 90 days of employment." .
+ex:VestingRule_A     a pen:VestingRule     ; pen:ruleText "100% vested after 3 years of service." .
+ex:ContributionRule_A a pen:ContributionRule ; pen:ruleText "Employee deferral up to 10% of salary; employer match 50% up to 6%." .
+ex:BenefitRule_DB     a pen:BenefitRule      ; pen:ruleText "Annual benefit = 1.5% * final avg pay * years of service." .
+
+ex:ERISA a pen:Regulation ; pen:regulationName "ERISA (US)" .
+
+#################################################################
+# Investment Options
+#################################################################
+
+ex:US_Equity_Fund a pen:Fund .
+ex:Bond_Fund      a pen:Fund .
+ex:Stable_Value   a pen:InvestmentOption .
+
+#################################################################
+# Plans
+#################################################################
+
+ex:Acme401k a pen:DefinedContributionPlan ;
+  pen:sponsoredBy ex:AcmeCorp ;
+  pen:administeredBy ex:PrimeAdmin ;
+  pen:trustee ex:TrustCo ;
+  pen:governedByRule ex:EligibilityRule_A, ex:VestingRule_A, ex:ContributionRule_A ;
+  pen:subjectToRegulation ex:ERISA ;
+  pen:offersInvestmentOption ex:US_Equity_Fund, ex:Bond_Fund, ex:Stable_Value .
+
+ex:AcmeDBPlan a pen:DefinedBenefitPlan ;
+  pen:sponsoredBy ex:AcmeCorp ;
+  pen:administeredBy ex:PrimeAdmin ;
+  pen:trustee ex:TrustCo ;
+  pen:governedByRule ex:EligibilityRule_A, ex:VestingRule_A, ex:BenefitRule_DB ;
+  pen:subjectToRegulation ex:ERISA .
+
+# Attach identifiers to plans (optional but helpful)
+ex:Acme401k pen:hasIdentifier ex:idPlan401k .
+ex:AcmeDBPlan pen:hasIdentifier ex:idPlanDB .
+
+#################################################################
+# Accounts / Portfolios
+#################################################################
+
+# Alice DC account
+ex:Alice401kAcct a pen:MemberAccount ;
+  pen:accountForPlan ex:Acme401k ;
+  pen:accountOwner ex:Alice ;
+  pen:hasPortfolio ex:AlicePortfolio .
+
+ex:AlicePortfolio a pen:Portfolio ;
+  pen:hasHolding ex:AliceHoldEq, ex:AliceHoldBond .
+
+ex:AliceHoldEq a pen:Holding ;
+  pen:holdingAsset ex:Asset_EquityUnits ;
+  pen:holdingUnits "120.50"^^xsd:decimal .
+
+ex:AliceHoldBond a pen:Holding ;
+  pen:holdingAsset ex:Asset_BondUnits ;
+  pen:holdingUnits "80.00"^^xsd:decimal .
+
+# Bob DC account
+ex:Bob401kAcct a pen:MemberAccount ;
+  pen:accountForPlan ex:Acme401k ;
+  pen:accountOwner ex:Bob ;
+  pen:hasPortfolio ex:BobPortfolio .
+
+ex:BobPortfolio a pen:Portfolio ;
+  pen:hasHolding ex:BobHoldStable .
+
+ex:BobHoldStable a pen:Holding ;
+  pen:holdingAsset ex:Asset_StableValueUnits ;
+  pen:holdingUnits "200.00"^^xsd:decimal .
+
+# Cara DB “account” (recordkeeping bucket)
+ex:CaraDBAcct a pen:MemberAccount ;
+  pen:accountForPlan ex:AcmeDBPlan ;
+  pen:accountOwner ex:Cara .
+
+# Link members to plans + accounts
+ex:Alice pen:enrolledInPlan ex:Acme401k ; pen:hasMemberAccount ex:Alice401kAcct .
+ex:Bob   pen:enrolledInPlan ex:Acme401k ; pen:hasMemberAccount ex:Bob401kAcct .
+ex:Cara  pen:enrolledInPlan ex:AcmeDBPlan ; pen:hasMemberAccount ex:CaraDBAcct .
+
+#################################################################
+# Assets (underlying)
+#################################################################
+
+ex:Asset_EquityUnits a pen:Asset .
+ex:Asset_BondUnits   a pen:Asset .
+ex:Asset_StableValueUnits a pen:Asset .
+
+#################################################################
+# Events (lifecycle)
+#################################################################
+
+ex:AliceEnrollEvt a pen:EnrollmentEvent ; pen:eventType "ENROLLMENT" ; pen:eventDate "2022-04-01"^^xsd:date .
+ex:BobEnrollEvt   a pen:EnrollmentEvent ; pen:eventType "ENROLLMENT" ; pen:eventDate "2021-02-15"^^xsd:date .
+ex:CaraRetireEvt  a pen:RetirementEvent ; pen:eventType "RETIREMENT" ; pen:eventDate "2025-06-30"^^xsd:date .
+
+ex:Alice pen:hasEvent ex:AliceEnrollEvt .
+ex:Bob   pen:hasEvent ex:BobEnrollEvt .
+ex:Cara  pen:hasEvent ex:CaraRetireEvt .
+
+#################################################################
+# Beneficiary Designations
+#################################################################
+
+ex:AliceBenDesig a pen:BeneficiaryDesignation ;
+  pen:designatesBeneficiary ex:Dan ;
+  pen:designationShare "1.0"^^xsd:decimal .
+ex:Alice pen:hasBeneficiaryDesignation ex:AliceBenDesig .
+
+ex:BobBenDesig a pen:BeneficiaryDesignation ;
+  pen:designatesBeneficiary ex:Eve ;
+  pen:designationShare "1.0"^^xsd:decimal .
+ex:Bob pen:hasBeneficiaryDesignation ex:BobBenDesig .
+
+#################################################################
+# Contributions + Transactions + Allocations
+#################################################################
+
+# Alice: two contributions, plus allocation transactions
+ex:Contrib_Alice_2025_01 a pen:EmployeeContribution ;
+  pen:contributionToAccount ex:Alice401kAcct ;
+  pen:contributedBy ex:Alice ;
+  pen:contributionAmount "500.00"^^xsd:decimal ;
+  pen:contributionDate "2025-01-31"^^xsd:date .
+
+ex:Contrib_Alice_2025_02 a pen:EmployerContribution ;
+  pen:contributionToAccount ex:Alice401kAcct ;
+  pen:contributedBy ex:AcmeCorp ;
+  pen:contributionAmount "250.00"^^xsd:decimal ;
+  pen:contributionDate "2025-02-28"^^xsd:date .
+
+ex:Tx_Alice_Alloc_2025_01 a pen:Allocation ;
+  pen:transactionType "ALLOCATION" ;
+  pen:transactionAmount "500.00"^^xsd:decimal ;
+  pen:transactionDateTime "2025-01-31T17:00:00Z"^^xsd:dateTime ;
+  pen:allocatedToInvestmentOption ex:US_Equity_Fund .
+
+ex:Tx_Alice_Alloc_2025_02 a pen:Allocation ;
+  pen:transactionType "ALLOCATION" ;
+  pen:transactionAmount "250.00"^^xsd:decimal ;
+  pen:transactionDateTime "2025-02-28T17:00:00Z"^^xsd:dateTime ;
+  pen:allocatedToInvestmentOption ex:Bond_Fund .
+
+ex:Alice401kAcct pen:hasTransaction ex:Tx_Alice_Alloc_2025_01, ex:Tx_Alice_Alloc_2025_02 .
+
+# Bob: three contributions, a fee transaction, and allocation
+ex:Contrib_Bob_2025_01 a pen:EmployeeContribution ;
+  pen:contributionToAccount ex:Bob401kAcct ;
+  pen:contributedBy ex:Bob ;
+  pen:contributionAmount "600.00"^^xsd:decimal ;
+  pen:contributionDate "2025-01-31"^^xsd:date .
+
+ex:Contrib_Bob_2025_02 a pen:EmployerContribution ;
+  pen:contributionToAccount ex:Bob401kAcct ;
+  pen:contributedBy ex:AcmeCorp ;
+  pen:contributionAmount "300.00"^^xsd:decimal ;
+  pen:contributionDate "2025-02-28"^^xsd:date .
+
+ex:Contrib_Bob_2025_03 a pen:EmployeeContribution ;
+  pen:contributionToAccount ex:Bob401kAcct ;
+  pen:contributedBy ex:Bob ;
+  pen:contributionAmount "650.00"^^xsd:decimal ;
+  pen:contributionDate "2025-03-31"^^xsd:date .
+
+ex:Tx_Bob_Alloc_2025_01 a pen:Allocation ;
+  pen:transactionType "ALLOCATION" ;
+  pen:transactionAmount "600.00"^^xsd:decimal ;
+  pen:transactionDateTime "2025-01-31T17:00:00Z"^^xsd:dateTime ;
+  pen:allocatedToInvestmentOption ex:Stable_Value .
+
+ex:Tx_Bob_Fee_2025_02 a pen:Fee ;
+  pen:transactionType "RECORDKEEPING_FEE" ;
+  pen:transactionAmount "-12.00"^^xsd:decimal ;
+  pen:transactionDateTime "2025-02-15T17:00:00Z"^^xsd:dateTime .
+
+ex:Bob401kAcct pen:hasTransaction ex:Tx_Bob_Alloc_2025_01, ex:Tx_Bob_Fee_2025_02 .
+
+#################################################################
+# Benefits, Calculations, Claims, Decisions, Payments
+#################################################################
+
+# Cara (DB) retirement benefit
+ex:CaraRetBenefit a pen:RetirementBenefit ;
+  pen:benefitForMember ex:Cara ;
+  pen:benefitDerivedFromPlan ex:AcmeDBPlan ;
+  pen:hasBenefitCalculation ex:CaraCalc1 ;
+  pen:hasPaymentSchedule ex:CaraMonthlySchedule .
+
+ex:CaraCalc1 a pen:BenefitCalculation ;
+  pen:calculationDate "2025-07-05"^^xsd:date ;
+  pen:calculationMethod "DB_FORMULA_V1" ;
+  pen:calculatedAmount "3200.00"^^xsd:decimal .
+
+ex:CaraMonthlySchedule a pen:PaymentSchedule ;
+  pen:scheduleFrequency "MONTHLY" .
+
+# Claim + decision
+ex:Claim_Cara_2025 a pen:Claim ;
+  pen:claimForBenefit ex:CaraRetBenefit ;
+  pen:claimant ex:Cara ;
+  pen:hasClaimDecision ex:ClaimDecision_Cara_2025 .
+
+ex:ClaimDecision_Cara_2025 a pen:ClaimDecision ;
+  pen:decisionStatus "APPROVED" ;
+  pen:decisionDate "2025-07-10"^^xsd:date .
+
+# Payments (two months)
+ex:Payment_Cara_2025_08 a pen:PensionPayment ;
+  pen:paysBenefit ex:CaraRetBenefit ;
+  pen:paymentTo ex:Cara ;
+  pen:paymentAmount "3200.00"^^xsd:decimal ;
+  pen:paymentDate "2025-08-01"^^xsd:date .
+
+ex:Payment_Cara_2025_09 a pen:PensionPayment ;
+  pen:paysBenefit ex:CaraRetBenefit ;
+  pen:paymentTo ex:Cara ;
+  pen:paymentAmount "3200.00"^^xsd:decimal ;
+  pen:paymentDate "2025-09-01"^^xsd:date .
+
+# Tax withholding for one payment
+ex:US_CA a pen:TaxJurisdiction .
+ex:Withhold_Cara_2025_08 a pen:TaxWithholding ;
+  pen:withholdingForPayment ex:Payment_Cara_2025_08 ;
+  pen:withholdingJurisdiction ex:US_CA ;
+  pen:withholdingAmount "400.00"^^xsd:decimal .
+
+#################################################################
+# Compliance Checks
+#################################################################
+
+ex:KYC_Alice_2025 a pen:KYCCheck ;
+  pen:checkStatus "PASSED" ;
+  pen:checkDate "2025-01-10"^^xsd:date .
+ex:AML_Alice_2025 a pen:AMLCheck ;
+  pen:checkStatus "PASSED" ;
+  pen:checkDate "2025-01-10"^^xsd:date .
+
+ex:KYC_Bob_2025 a pen:KYCCheck ;
+  pen:checkStatus "PENDING" ;
+  pen:checkDate "2025-02-01"^^xsd:date .
+
+ex:Alice pen:hasComplianceCheck ex:KYC_Alice_2025, ex:AML_Alice_2025 .
+ex:Bob   pen:hasComplianceCheck ex:KYC_Bob_2025 .
+
+#################################################################
+# Optional: Insurance Policy wrapping plan liabilities (annuity)
+#################################################################
+
+ex:AcmeGroupAnnuityPolicy a pen:InsurancePolicy ;
+  pen:insuredBy ex:InsureCo .

@@ -1,0 +1,9 @@
+# queries/compliance_checks.rq
+PREFIX pen: <https://example.com/ontology/pension-insurance#>
+SELECT ?party ?check ?type ?status ?dt WHERE {
+  ?party pen:hasComplianceCheck ?check .
+  ?check a ?type ;
+         pen:checkStatus ?status ;
+         pen:checkDate ?dt .
+}
+ORDER BY ?party ?dt

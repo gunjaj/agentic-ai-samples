@@ -1,0 +1,9 @@
+# queries/list_plans.rq
+PREFIX pen: <https://example.com/ontology/pension-insurance#>
+SELECT ?plan ?sponsor ?admin ?trustee WHERE {
+  ?plan a pen:PensionPlan ;
+        pen:sponsoredBy ?sponsor ;
+        pen:administeredBy ?admin .
+  OPTIONAL { ?plan pen:trustee ?trustee }
+}
+ORDER BY ?plan

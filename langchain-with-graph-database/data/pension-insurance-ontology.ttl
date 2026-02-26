@@ -1,0 +1,641 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix pen:  <https://example.com/ontology/pension-insurance#> .
+
+#################################################################
+# Ontology header (RDFS-friendly: just a resource with labels)
+#################################################################
+
+pen:Ontology a rdfs:Resource ;
+  rdfs:label "Pension Insurance Management Ontology (RDFS)" ;
+  rdfs:comment "RDFS vocabulary for insurance industry concepts related to managing pensions (plans, members, contributions, benefits, payments, investments, governance, compliance)." .
+
+#################################################################
+# Core Parties / Actors
+#################################################################
+
+pen:Party a rdfs:Class ;
+  rdfs:label "Party" ;
+  rdfs:comment "A legal or natural person that can play roles in pension/insurance processes." .
+
+pen:Person a rdfs:Class ;
+  rdfs:subClassOf pen:Party ;
+  rdfs:label "Person" .
+
+pen:Organization a rdfs:Class ;
+  rdfs:subClassOf pen:Party ;
+  rdfs:label "Organization" .
+
+pen:PlanSponsor a rdfs:Class ;
+  rdfs:subClassOf pen:Organization ;
+  rdfs:label "Plan Sponsor" ;
+  rdfs:comment "Organization sponsoring the pension plan (often an employer)." .
+
+pen:Employer a rdfs:Class ;
+  rdfs:subClassOf pen:Organization ;
+  rdfs:label "Employer" .
+
+pen:Insurer a rdfs:Class ;
+  rdfs:subClassOf pen:Organization ;
+  rdfs:label "Insurer" ;
+  rdfs:comment "Insurance carrier providing insured pension products (e.g., annuities) and/or risk coverage." .
+
+pen:Trustee a rdfs:Class ;
+  rdfs:subClassOf pen:Party ;
+  rdfs:label "Trustee" ;
+  rdfs:comment "Party responsible for trust governance and fiduciary duties." .
+
+pen:Administrator a rdfs:Class ;
+  rdfs:subClassOf pen:Party ;
+  rdfs:label "Administrator" ;
+  rdfs:comment "Party administering plan operations (recordkeeping, benefit calc, payments, reporting)." .
+
+pen:Member a rdfs:Class ;
+  rdfs:subClassOf pen:Person ;
+  rdfs:label "Member" ;
+  rdfs:comment "Person enrolled in a pension plan." .
+
+pen:Policyholder a rdfs:Class ;
+  rdfs:subClassOf pen:Party ;
+  rdfs:label "Policyholder" ;
+  rdfs:comment "Party that owns an insurance policy (could be sponsor, trustee, or individual)." .
+
+pen:Beneficiary a rdfs:Class ;
+  rdfs:subClassOf pen:Person ;
+  rdfs:label "Beneficiary" ;
+  rdfs:comment "Person entitled to receive benefits upon qualifying events (death, retirement options, etc.)." .
+
+pen:Advisor a rdfs:Class ;
+  rdfs:subClassOf pen:Party ;
+  rdfs:label "Advisor" ;
+  rdfs:comment "Agent/broker/financial advisor role involved with plan or member decisions." .
+
+#################################################################
+# Plan / Policy / Coverage
+#################################################################
+
+pen:Product a rdfs:Class ;
+  rdfs:label "Product" ;
+  rdfs:comment "A financial/insurance product offering." .
+
+pen:PensionPlan a rdfs:Class ;
+  rdfs:label "Pension Plan" ;
+  rdfs:comment "A pension arrangement (DB, DC, hybrid) with rules, accounts, and benefits." .
+
+pen:DefinedContributionPlan a rdfs:Class ;
+  rdfs:subClassOf pen:PensionPlan ;
+  rdfs:label "Defined Contribution Plan" .
+
+pen:DefinedBenefitPlan a rdfs:Class ;
+  rdfs:subClassOf pen:PensionPlan ;
+  rdfs:label "Defined Benefit Plan" .
+
+pen:PlanDocument a rdfs:Class ;
+  rdfs:label "Plan Document" ;
+  rdfs:comment "Formal document describing plan terms and rules." .
+
+pen:InsurancePolicy a rdfs:Class ;
+  rdfs:label "Insurance Policy" ;
+  rdfs:comment "Insurance contract that may wrap pension liabilities (e.g., annuity contract, group policy)." .
+
+pen:Coverage a rdfs:Class ;
+  rdfs:label "Coverage" ;
+  rdfs:comment "Coverage component defining insured risks, limits, and conditions." .
+
+pen:Annuity a rdfs:Class ;
+  rdfs:subClassOf pen:Product ;
+  rdfs:label "Annuity" ;
+  rdfs:comment "Insurance product providing income stream, often used at retirement/decumulation." .
+
+#################################################################
+# Accounts / Recordkeeping
+#################################################################
+
+pen:Account a rdfs:Class ;
+  rdfs:label "Account" ;
+  rdfs:comment "Recordkeeping account tracking balances, units, and entitlements." .
+
+pen:MemberAccount a rdfs:Class ;
+  rdfs:subClassOf pen:Account ;
+  rdfs:label "Member Account" .
+
+pen:PlanAccount a rdfs:Class ;
+  rdfs:subClassOf pen:Account ;
+  rdfs:label "Plan Account" ;
+  rdfs:comment "Plan-level account(s) for pooled assets or accounting buckets." .
+
+pen:BeneficiaryDesignation a rdfs:Class ;
+  rdfs:label "Beneficiary Designation" ;
+  rdfs:comment "Designation of beneficiaries and allocation rules." .
+
+#################################################################
+# Money Flows: contributions, transactions, benefits, payments
+#################################################################
+
+pen:Contribution a rdfs:Class ;
+  rdfs:label "Contribution" ;
+  rdfs:comment "A monetary input to a plan/member account (employer, employee, rollover, etc.)." .
+
+pen:EmployeeContribution a rdfs:Class ;
+  rdfs:subClassOf pen:Contribution ;
+  rdfs:label "Employee Contribution" .
+
+pen:EmployerContribution a rdfs:Class ;
+  rdfs:subClassOf pen:Contribution ;
+  rdfs:label "Employer Contribution" .
+
+pen:Rollover a rdfs:Class ;
+  rdfs:subClassOf pen:Contribution ;
+  rdfs:label "Rollover" .
+
+pen:Transaction a rdfs:Class ;
+  rdfs:label "Transaction" ;
+  rdfs:comment "A ledger event that changes balances (buy/sell, fee, transfer, allocation, crediting)." .
+
+pen:Fee a rdfs:Class ;
+  rdfs:subClassOf pen:Transaction ;
+  rdfs:label "Fee" .
+
+pen:Transfer a rdfs:Class ;
+  rdfs:subClassOf pen:Transaction ;
+  rdfs:label "Transfer" .
+
+pen:Allocation a rdfs:Class ;
+  rdfs:subClassOf pen:Transaction ;
+  rdfs:label "Allocation" ;
+  rdfs:comment "Allocation of contributions/balances across investment options." .
+
+pen:Benefit a rdfs:Class ;
+  rdfs:label "Benefit" ;
+  rdfs:comment "Entitlement/payable outcome, calculated per plan rules (lump sum, annuity, survivor, disability)." .
+
+pen:RetirementBenefit a rdfs:Class ;
+  rdfs:subClassOf pen:Benefit ;
+  rdfs:label "Retirement Benefit" .
+
+pen:SurvivorBenefit a rdfs:Class ;
+  rdfs:subClassOf pen:Benefit ;
+  rdfs:label "Survivor Benefit" .
+
+pen:DisabilityBenefit a rdfs:Class ;
+  rdfs:subClassOf pen:Benefit ;
+  rdfs:label "Disability Benefit" .
+
+pen:BenefitCalculation a rdfs:Class ;
+  rdfs:label "Benefit Calculation" ;
+  rdfs:comment "Computation event/artifact with inputs, formula version, and results." .
+
+pen:Payment a rdfs:Class ;
+  rdfs:label "Payment" ;
+  rdfs:comment "Disbursement of money to a payee (member/beneficiary/third party)." .
+
+pen:PensionPayment a rdfs:Class ;
+  rdfs:subClassOf pen:Payment ;
+  rdfs:label "Pension Payment" .
+
+pen:PaymentSchedule a rdfs:Class ;
+  rdfs:label "Payment Schedule" ;
+  rdfs:comment "Cadence and timing rules for recurring payments." .
+
+#################################################################
+# Events / Lifecycle
+#################################################################
+
+pen:Event a rdfs:Class ;
+  rdfs:label "Event" ;
+  rdfs:comment "A business event relevant to membership, eligibility, or benefits." .
+
+pen:EnrollmentEvent a rdfs:Class ;
+  rdfs:subClassOf pen:Event ;
+  rdfs:label "Enrollment Event" .
+
+pen:EmploymentEvent a rdfs:Class ;
+  rdfs:subClassOf pen:Event ;
+  rdfs:label "Employment Event" .
+
+pen:TerminationEvent a rdfs:Class ;
+  rdfs:subClassOf pen:EmploymentEvent ;
+  rdfs:label "Termination Event" .
+
+pen:RetirementEvent a rdfs:Class ;
+  rdfs:subClassOf pen:Event ;
+  rdfs:label "Retirement Event" .
+
+pen:DeathEvent a rdfs:Class ;
+  rdfs:subClassOf pen:Event ;
+  rdfs:label "Death Event" .
+
+pen:Claim a rdfs:Class ;
+  rdfs:label "Claim" ;
+  rdfs:comment "A request for benefit payment or insured benefit adjudication." .
+
+pen:ClaimDecision a rdfs:Class ;
+  rdfs:label "Claim Decision" ;
+  rdfs:comment "Decision/outcome of claim review (approved/denied/pending), reasons, and dates." .
+
+#################################################################
+# Investments / Assets
+#################################################################
+
+pen:InvestmentOption a rdfs:Class ;
+  rdfs:label "Investment Option" ;
+  rdfs:comment "Selectable investment option (fund, portfolio, stable value, etc.)." .
+
+pen:Fund a rdfs:Class ;
+  rdfs:subClassOf pen:InvestmentOption ;
+  rdfs:label "Fund" .
+
+pen:Asset a rdfs:Class ;
+  rdfs:label "Asset" ;
+  rdfs:comment "Underlying asset held directly or indirectly (security, cash, etc.)." .
+
+pen:Portfolio a rdfs:Class ;
+  rdfs:label "Portfolio" ;
+  rdfs:comment "Collection of holdings attributed to an account, plan, or fund." .
+
+pen:Holding a rdfs:Class ;
+  rdfs:label "Holding" ;
+  rdfs:comment "Position in an asset within a portfolio." .
+
+#################################################################
+# Rules / Compliance / Tax
+#################################################################
+
+pen:Rule a rdfs:Class ;
+  rdfs:label "Rule" ;
+  rdfs:comment "A rule governing behavior, eligibility, calculations, or compliance." .
+
+pen:EligibilityRule a rdfs:Class ;
+  rdfs:subClassOf pen:Rule ;
+  rdfs:label "Eligibility Rule" .
+
+pen:VestingRule a rdfs:Class ;
+  rdfs:subClassOf pen:Rule ;
+  rdfs:label "Vesting Rule" .
+
+pen:ContributionRule a rdfs:Class ;
+  rdfs:subClassOf pen:Rule ;
+  rdfs:label "Contribution Rule" .
+
+pen:BenefitRule a rdfs:Class ;
+  rdfs:subClassOf pen:Rule ;
+  rdfs:label "Benefit Rule" .
+
+pen:Regulation a rdfs:Class ;
+  rdfs:label "Regulation" ;
+  rdfs:comment "External regulation or standard affecting plan/policy operations." .
+
+pen:TaxJurisdiction a rdfs:Class ;
+  rdfs:label "Tax Jurisdiction" .
+
+pen:TaxWithholding a rdfs:Class ;
+  rdfs:label "Tax Withholding" ;
+  rdfs:comment "Withholding applied to a payment under applicable jurisdictions." .
+
+pen:ComplianceCheck a rdfs:Class ;
+  rdfs:label "Compliance Check" ;
+  rdfs:comment "Check performed for compliance (KYC/AML/sanctions/eligibility validation)." .
+
+pen:KYCCheck a rdfs:Class ;
+  rdfs:subClassOf pen:ComplianceCheck ;
+  rdfs:label "KYC Check" .
+
+pen:AMLCheck a rdfs:Class ;
+  rdfs:subClassOf pen:ComplianceCheck ;
+  rdfs:label "AML Check" .
+
+#################################################################
+# Reference / Supporting entities
+#################################################################
+
+pen:Address a rdfs:Class ;
+  rdfs:label "Address" .
+
+pen:ContactPoint a rdfs:Class ;
+  rdfs:label "Contact Point" .
+
+pen:Identifier a rdfs:Class ;
+  rdfs:label "Identifier" ;
+  rdfs:comment "Identifier such as policy number, member id, plan id." .
+
+pen:Document a rdfs:Class ;
+  rdfs:label "Document" .
+
+pen:Statement a rdfs:Class ;
+  rdfs:subClassOf pen:Document ;
+  rdfs:label "Statement" ;
+  rdfs:comment "Periodic statement provided to members/sponsors." .
+
+#################################################################
+# Properties (RDFS)
+#################################################################
+
+# Generic naming / identifiers
+pen:hasIdentifier a rdf:Property ;
+  rdfs:label "has identifier" ;
+  rdfs:domain pen:Party ;
+  rdfs:range pen:Identifier .
+
+pen:identifierValue a rdf:Property ;
+  rdfs:label "identifier value" ;
+  rdfs:domain pen:Identifier ;
+  rdfs:range xsd:string .
+
+pen:identifierType a rdf:Property ;
+  rdfs:label "identifier type" ;
+  rdfs:domain pen:Identifier ;
+  rdfs:range xsd:string .
+
+# Relationships among parties
+pen:hasAddress a rdf:Property ;
+  rdfs:label "has address" ;
+  rdfs:domain pen:Party ;
+  rdfs:range pen:Address .
+
+pen:hasContactPoint a rdf:Property ;
+  rdfs:label "has contact point" ;
+  rdfs:domain pen:Party ;
+  rdfs:range pen:ContactPoint .
+
+pen:sponsoredBy a rdf:Property ;
+  rdfs:label "sponsored by" ;
+  rdfs:domain pen:PensionPlan ;
+  rdfs:range pen:PlanSponsor .
+
+pen:administeredBy a rdf:Property ;
+  rdfs:label "administered by" ;
+  rdfs:domain pen:PensionPlan ;
+  rdfs:range pen:Administrator .
+
+pen:insuredBy a rdf:Property ;
+  rdfs:label "insured by" ;
+  rdfs:domain pen:InsurancePolicy ;
+  rdfs:range pen:Insurer .
+
+pen:trustee a rdf:Property ;
+  rdfs:label "trustee" ;
+  rdfs:domain pen:PensionPlan ;
+  rdfs:range pen:Trustee .
+
+# Membership / enrollment
+pen:enrolledInPlan a rdf:Property ;
+  rdfs:label "enrolled in plan" ;
+  rdfs:domain pen:Member ;
+  rdfs:range pen:PensionPlan .
+
+pen:hasMemberAccount a rdf:Property ;
+  rdfs:label "has member account" ;
+  rdfs:domain pen:Member ;
+  rdfs:range pen:MemberAccount .
+
+pen:accountForPlan a rdf:Property ;
+  rdfs:label "account for plan" ;
+  rdfs:domain pen:Account ;
+  rdfs:range pen:PensionPlan .
+
+pen:accountOwner a rdf:Property ;
+  rdfs:label "account owner" ;
+  rdfs:domain pen:MemberAccount ;
+  rdfs:range pen:Member .
+
+# Beneficiaries
+pen:hasBeneficiaryDesignation a rdf:Property ;
+  rdfs:label "has beneficiary designation" ;
+  rdfs:domain pen:Member ;
+  rdfs:range pen:BeneficiaryDesignation .
+
+pen:designatesBeneficiary a rdf:Property ;
+  rdfs:label "designates beneficiary" ;
+  rdfs:domain pen:BeneficiaryDesignation ;
+  rdfs:range pen:Beneficiary .
+
+pen:designationShare a rdf:Property ;
+  rdfs:label "designation share" ;
+  rdfs:domain pen:BeneficiaryDesignation ;
+  rdfs:range xsd:decimal .
+
+# Contributions / transactions
+pen:contributionToAccount a rdf:Property ;
+  rdfs:label "contribution to account" ;
+  rdfs:domain pen:Contribution ;
+  rdfs:range pen:Account .
+
+pen:contributedBy a rdf:Property ;
+  rdfs:label "contributed by" ;
+  rdfs:domain pen:Contribution ;
+  rdfs:range pen:Party .
+
+pen:contributionAmount a rdf:Property ;
+  rdfs:label "contribution amount" ;
+  rdfs:domain pen:Contribution ;
+  rdfs:range xsd:decimal .
+
+pen:contributionDate a rdf:Property ;
+  rdfs:label "contribution date" ;
+  rdfs:domain pen:Contribution ;
+  rdfs:range xsd:date .
+
+pen:hasTransaction a rdf:Property ;
+  rdfs:label "has transaction" ;
+  rdfs:domain pen:Account ;
+  rdfs:range pen:Transaction .
+
+pen:transactionAmount a rdf:Property ;
+  rdfs:label "transaction amount" ;
+  rdfs:domain pen:Transaction ;
+  rdfs:range xsd:decimal .
+
+pen:transactionDateTime a rdf:Property ;
+  rdfs:label "transaction date time" ;
+  rdfs:domain pen:Transaction ;
+  rdfs:range xsd:dateTime .
+
+pen:transactionType a rdf:Property ;
+  rdfs:label "transaction type" ;
+  rdfs:domain pen:Transaction ;
+  rdfs:range xsd:string .
+
+# Investments
+pen:offersInvestmentOption a rdf:Property ;
+  rdfs:label "offers investment option" ;
+  rdfs:domain pen:PensionPlan ;
+  rdfs:range pen:InvestmentOption .
+
+pen:allocatedToInvestmentOption a rdf:Property ;
+  rdfs:label "allocated to investment option" ;
+  rdfs:domain pen:Allocation ;
+  rdfs:range pen:InvestmentOption .
+
+pen:hasPortfolio a rdf:Property ;
+  rdfs:label "has portfolio" ;
+  rdfs:domain pen:Account ;
+  rdfs:range pen:Portfolio .
+
+pen:hasHolding a rdf:Property ;
+  rdfs:label "has holding" ;
+  rdfs:domain pen:Portfolio ;
+  rdfs:range pen:Holding .
+
+pen:holdingAsset a rdf:Property ;
+  rdfs:label "holding asset" ;
+  rdfs:domain pen:Holding ;
+  rdfs:range pen:Asset .
+
+pen:holdingUnits a rdf:Property ;
+  rdfs:label "holding units" ;
+  rdfs:domain pen:Holding ;
+  rdfs:range xsd:decimal .
+
+# Benefits / claims / payments
+pen:benefitForMember a rdf:Property ;
+  rdfs:label "benefit for member" ;
+  rdfs:domain pen:Benefit ;
+  rdfs:range pen:Member .
+
+pen:benefitDerivedFromPlan a rdf:Property ;
+  rdfs:label "benefit derived from plan" ;
+  rdfs:domain pen:Benefit ;
+  rdfs:range pen:PensionPlan .
+
+pen:hasBenefitCalculation a rdf:Property ;
+  rdfs:label "has benefit calculation" ;
+  rdfs:domain pen:Benefit ;
+  rdfs:range pen:BenefitCalculation .
+
+pen:calculationDate a rdf:Property ;
+  rdfs:label "calculation date" ;
+  rdfs:domain pen:BenefitCalculation ;
+  rdfs:range xsd:date .
+
+pen:calculationMethod a rdf:Property ;
+  rdfs:label "calculation method" ;
+  rdfs:domain pen:BenefitCalculation ;
+  rdfs:range xsd:string .
+
+pen:calculatedAmount a rdf:Property ;
+  rdfs:label "calculated amount" ;
+  rdfs:domain pen:BenefitCalculation ;
+  rdfs:range xsd:decimal .
+
+pen:claimForBenefit a rdf:Property ;
+  rdfs:label "claim for benefit" ;
+  rdfs:domain pen:Claim ;
+  rdfs:range pen:Benefit .
+
+pen:claimant a rdf:Property ;
+  rdfs:label "claimant" ;
+  rdfs:domain pen:Claim ;
+  rdfs:range pen:Party .
+
+pen:hasClaimDecision a rdf:Property ;
+  rdfs:label "has claim decision" ;
+  rdfs:domain pen:Claim ;
+  rdfs:range pen:ClaimDecision .
+
+pen:decisionStatus a rdf:Property ;
+  rdfs:label "decision status" ;
+  rdfs:domain pen:ClaimDecision ;
+  rdfs:range xsd:string .
+
+pen:decisionDate a rdf:Property ;
+  rdfs:label "decision date" ;
+  rdfs:domain pen:ClaimDecision ;
+  rdfs:range xsd:date .
+
+pen:paysBenefit a rdf:Property ;
+  rdfs:label "pays benefit" ;
+  rdfs:domain pen:Payment ;
+  rdfs:range pen:Benefit .
+
+pen:paymentTo a rdf:Property ;
+  rdfs:label "payment to" ;
+  rdfs:domain pen:Payment ;
+  rdfs:range pen:Party .
+
+pen:paymentAmount a rdf:Property ;
+  rdfs:label "payment amount" ;
+  rdfs:domain pen:Payment ;
+  rdfs:range xsd:decimal .
+
+pen:paymentDate a rdf:Property ;
+  rdfs:label "payment date" ;
+  rdfs:domain pen:Payment ;
+  rdfs:range xsd:date .
+
+pen:hasPaymentSchedule a rdf:Property ;
+  rdfs:label "has payment schedule" ;
+  rdfs:domain pen:Benefit ;
+  rdfs:range pen:PaymentSchedule .
+
+pen:scheduleFrequency a rdf:Property ;
+  rdfs:label "schedule frequency" ;
+  rdfs:domain pen:PaymentSchedule ;
+  rdfs:range xsd:string .
+
+# Events
+pen:hasEvent a rdf:Property ;
+  rdfs:label "has event" ;
+  rdfs:domain pen:Member ;
+  rdfs:range pen:Event .
+
+pen:eventDate a rdf:Property ;
+  rdfs:label "event date" ;
+  rdfs:domain pen:Event ;
+  rdfs:range xsd:date .
+
+pen:eventType a rdf:Property ;
+  rdfs:label "event type" ;
+  rdfs:domain pen:Event ;
+  rdfs:range xsd:string .
+
+# Rules / compliance / tax
+pen:governedByRule a rdf:Property ;
+  rdfs:label "governed by rule" ;
+  rdfs:domain pen:PensionPlan ;
+  rdfs:range pen:Rule .
+
+pen:ruleText a rdf:Property ;
+  rdfs:label "rule text" ;
+  rdfs:domain pen:Rule ;
+  rdfs:range xsd:string .
+
+pen:subjectToRegulation a rdf:Property ;
+  rdfs:label "subject to regulation" ;
+  rdfs:domain pen:PensionPlan ;
+  rdfs:range pen:Regulation .
+
+pen:regulationName a rdf:Property ;
+  rdfs:label "regulation name" ;
+  rdfs:domain pen:Regulation ;
+  rdfs:range xsd:string .
+
+pen:hasComplianceCheck a rdf:Property ;
+  rdfs:label "has compliance check" ;
+  rdfs:domain pen:Party ;
+  rdfs:range pen:ComplianceCheck .
+
+pen:checkStatus a rdf:Property ;
+  rdfs:label "check status" ;
+  rdfs:domain pen:ComplianceCheck ;
+  rdfs:range xsd:string .
+
+pen:checkDate a rdf:Property ;
+  rdfs:label "check date" ;
+  rdfs:domain pen:ComplianceCheck ;
+  rdfs:range xsd:date .
+
+pen:withholdingForPayment a rdf:Property ;
+  rdfs:label "withholding for payment" ;
+  rdfs:domain pen:TaxWithholding ;
+  rdfs:range pen:Payment .
+
+pen:withholdingJurisdiction a rdf:Property ;
+  rdfs:label "withholding jurisdiction" ;
+  rdfs:domain pen:TaxWithholding ;
+  rdfs:range pen:TaxJurisdiction .
+
+pen:withholdingAmount a rdf:Property ;
+  rdfs:label "withholding amount" ;
+  rdfs:domain pen:TaxWithholding ;
+  rdfs:range xsd:decimal .

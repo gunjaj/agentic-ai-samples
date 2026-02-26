@@ -1,0 +1,10 @@
+# queries/contrib_totals_by_contributor.rq
+PREFIX pen: <https://example.com/ontology/pension-insurance#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?contributor (SUM(xsd:decimal(?amt)) AS ?total) WHERE {
+  ?c a pen:Contribution ;
+     pen:contributedBy ?contributor ;
+     pen:contributionAmount ?amt .
+}
+GROUP BY ?contributor
+ORDER BY DESC(?total)

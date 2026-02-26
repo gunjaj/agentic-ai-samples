@@ -1,0 +1,12 @@
+# queries/approved_claims.rq
+PREFIX pen: <https://example.com/ontology/pension-insurance#>
+SELECT ?claim ?member ?benefit ?status ?decisionDate WHERE {
+  ?claim a pen:Claim ;
+         pen:claimForBenefit ?benefit ;
+         pen:hasClaimDecision ?dec .
+  ?dec pen:decisionStatus ?status ;
+       pen:decisionDate ?decisionDate .
+  FILTER(?status = "APPROVED")
+  ?benefit pen:benefitForMember ?member .
+}
+ORDER BY ?decisionDate

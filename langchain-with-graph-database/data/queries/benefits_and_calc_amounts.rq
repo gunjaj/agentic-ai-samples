@@ -1,0 +1,12 @@
+# queries/benefits_and_calc_amounts.rq
+PREFIX pen: <https://example.com/ontology/pension-insurance#>
+SELECT ?benefit ?member ?plan ?method ?amount ?calcDate WHERE {
+  ?benefit a pen:Benefit ;
+           pen:benefitForMember ?member ;
+           pen:benefitDerivedFromPlan ?plan ;
+           pen:hasBenefitCalculation ?calc .
+  ?calc pen:calculationMethod ?method ;
+        pen:calculatedAmount ?amount ;
+        pen:calculationDate ?calcDate .
+}
+ORDER BY ?member ?benefit

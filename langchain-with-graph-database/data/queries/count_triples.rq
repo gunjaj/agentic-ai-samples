@@ -1,0 +1,2 @@
+# queries/count_triples.rq
+SELECT (COUNT(*) AS ?triples) WHERE { ?s ?p ?o }

@@ -1,0 +1,448 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix pen:  <https://example.com/ontology/pension-insurance#> .
+
+#################################################################
+# SHACL Shapes for Pension Insurance Management Ontology
+# (Designed to validate core pension administration entities)
+#################################################################
+
+pen:ShapesGraph a rdfs:Resource ;
+  rdfs:label "Pension Insurance SHACL Shapes" ;
+  rdfs:comment "SHACL constraints for key concepts: plans, members, accounts, contributions, benefits, payments, claims, investments, compliance." .
+
+#################################################################
+# Helper shapes
+#################################################################
+
+pen:IdentifierShape a sh:NodeShape ;
+  sh:targetClass pen:Identifier ;
+  sh:property [
+    sh:path pen:identifierValue ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:identifierType ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] .
+
+#################################################################
+# Parties / Actors
+#################################################################
+
+pen:PartyShape a sh:NodeShape ;
+  sh:targetClass pen:Party ;
+  sh:property [
+    sh:path pen:hasIdentifier ;
+    sh:class pen:Identifier ;
+    sh:minCount 1 ;
+  ] .
+
+pen:MemberShape a sh:NodeShape ;
+  sh:targetClass pen:Member ;
+  sh:property [
+    sh:path pen:enrolledInPlan ;
+    sh:class pen:PensionPlan ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:hasMemberAccount ;
+    sh:class pen:MemberAccount ;
+    sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:hasBeneficiaryDesignation ;
+    sh:class pen:BeneficiaryDesignation ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:hasEvent ;
+    sh:class pen:Event ;
+  ] .
+
+pen:OrganizationShape a sh:NodeShape ;
+  sh:targetClass pen:Organization ;
+  sh:property [
+    sh:path pen:hasIdentifier ;
+    sh:class pen:Identifier ;
+    sh:minCount 1 ;
+  ] .
+
+#################################################################
+# Plan / Policy
+#################################################################
+
+pen:PensionPlanShape a sh:NodeShape ;
+  sh:targetClass pen:PensionPlan ;
+  sh:property [
+    sh:path pen:sponsoredBy ;
+    sh:class pen:PlanSponsor ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:administeredBy ;
+    sh:class pen:Administrator ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:trustee ;
+    sh:class pen:Trustee ;
+    sh:minCount 0 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:governedByRule ;
+    sh:class pen:Rule ;
+    sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:offersInvestmentOption ;
+    sh:class pen:InvestmentOption ;
+  ] .
+
+pen:InsurancePolicyShape a sh:NodeShape ;
+  sh:targetClass pen:InsurancePolicy ;
+  sh:property [
+    sh:path pen:insuredBy ;
+    sh:class pen:Insurer ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] .
+
+#################################################################
+# Accounts / Recordkeeping
+#################################################################
+
+pen:AccountShape a sh:NodeShape ;
+  sh:targetClass pen:Account ;
+  sh:property [
+    sh:path pen:accountForPlan ;
+    sh:class pen:PensionPlan ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:hasTransaction ;
+    sh:class pen:Transaction ;
+  ] .
+
+pen:MemberAccountShape a sh:NodeShape ;
+  sh:targetClass pen:MemberAccount ;
+  sh:property [
+    sh:path pen:accountOwner ;
+    sh:class pen:Member ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:hasPortfolio ;
+    sh:class pen:Portfolio ;
+    sh:maxCount 1 ;
+  ] .
+
+pen:BeneficiaryDesignationShape a sh:NodeShape ;
+  sh:targetClass pen:BeneficiaryDesignation ;
+  sh:property [
+    sh:path pen:designatesBeneficiary ;
+    sh:class pen:Beneficiary ;
+    sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:designationShare ;
+    sh:datatype xsd:decimal ;
+    sh:minInclusive 0.0 ;
+    sh:maxInclusive 1.0 ;
+  ] .
+
+#################################################################
+# Contributions / Transactions
+#################################################################
+
+pen:ContributionShape a sh:NodeShape ;
+  sh:targetClass pen:Contribution ;
+  sh:property [
+    sh:path pen:contributionToAccount ;
+    sh:class pen:Account ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:contributedBy ;
+    sh:class pen:Party ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:contributionAmount ;
+    sh:datatype xsd:decimal ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:minExclusive 0 ;
+  ] ;
+  sh:property [
+    sh:path pen:contributionDate ;
+    sh:datatype xsd:date ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] .
+
+pen:TransactionShape a sh:NodeShape ;
+  sh:targetClass pen:Transaction ;
+  sh:property [
+    sh:path pen:transactionAmount ;
+    sh:datatype xsd:decimal ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:transactionDateTime ;
+    sh:datatype xsd:dateTime ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:transactionType ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] .
+
+pen:AllocationShape a sh:NodeShape ;
+  sh:targetClass pen:Allocation ;
+  sh:property [
+    sh:path pen:allocatedToInvestmentOption ;
+    sh:class pen:InvestmentOption ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] .
+
+#################################################################
+# Benefits / Claims / Payments
+#################################################################
+
+pen:BenefitShape a sh:NodeShape ;
+  sh:targetClass pen:Benefit ;
+  sh:property [
+    sh:path pen:benefitForMember ;
+    sh:class pen:Member ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:benefitDerivedFromPlan ;
+    sh:class pen:PensionPlan ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:hasBenefitCalculation ;
+    sh:class pen:BenefitCalculation ;
+    sh:minCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:hasPaymentSchedule ;
+    sh:class pen:PaymentSchedule ;
+    sh:maxCount 1 ;
+  ] .
+
+pen:BenefitCalculationShape a sh:NodeShape ;
+  sh:targetClass pen:BenefitCalculation ;
+  sh:property [
+    sh:path pen:calculationDate ;
+    sh:datatype xsd:date ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:calculationMethod ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:calculatedAmount ;
+    sh:datatype xsd:decimal ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:minInclusive 0 ;
+  ] .
+
+pen:ClaimShape a sh:NodeShape ;
+  sh:targetClass pen:Claim ;
+  sh:property [
+    sh:path pen:claimForBenefit ;
+    sh:class pen:Benefit ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:claimant ;
+    sh:class pen:Party ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:hasClaimDecision ;
+    sh:class pen:ClaimDecision ;
+    sh:maxCount 1 ;
+  ] .
+
+pen:ClaimDecisionShape a sh:NodeShape ;
+  sh:targetClass pen:ClaimDecision ;
+  sh:property [
+    sh:path pen:decisionStatus ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:in ("APPROVED" "DENIED" "PENDING") ;
+  ] ;
+  sh:property [
+    sh:path pen:decisionDate ;
+    sh:datatype xsd:date ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] .
+
+pen:PaymentShape a sh:NodeShape ;
+  sh:targetClass pen:Payment ;
+  sh:property [
+    sh:path pen:paysBenefit ;
+    sh:class pen:Benefit ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:paymentTo ;
+    sh:class pen:Party ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:paymentAmount ;
+    sh:datatype xsd:decimal ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:minExclusive 0 ;
+  ] ;
+  sh:property [
+    sh:path pen:paymentDate ;
+    sh:datatype xsd:date ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] .
+
+pen:PaymentScheduleShape a sh:NodeShape ;
+  sh:targetClass pen:PaymentSchedule ;
+  sh:property [
+    sh:path pen:scheduleFrequency ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:in ("MONTHLY" "QUARTERLY" "SEMI_ANNUAL" "ANNUAL" "ONE_TIME") ;
+  ] .
+
+#################################################################
+# Events
+#################################################################
+
+pen:EventShape a sh:NodeShape ;
+  sh:targetClass pen:Event ;
+  sh:property [
+    sh:path pen:eventDate ;
+    sh:datatype xsd:date ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:eventType ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] .
+
+#################################################################
+# Investments
+#################################################################
+
+pen:PortfolioShape a sh:NodeShape ;
+  sh:targetClass pen:Portfolio ;
+  sh:property [
+    sh:path pen:hasHolding ;
+    sh:class pen:Holding ;
+  ] .
+
+pen:HoldingShape a sh:NodeShape ;
+  sh:targetClass pen:Holding ;
+  sh:property [
+    sh:path pen:holdingAsset ;
+    sh:class pen:Asset ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:holdingUnits ;
+    sh:datatype xsd:decimal ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:minInclusive 0 ;
+  ] .
+
+#################################################################
+# Rules / Compliance / Tax
+#################################################################
+
+pen:RuleShape a sh:NodeShape ;
+  sh:targetClass pen:Rule ;
+  sh:property [
+    sh:path pen:ruleText ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] .
+
+pen:ComplianceCheckShape a sh:NodeShape ;
+  sh:targetClass pen:ComplianceCheck ;
+  sh:property [
+    sh:path pen:checkStatus ;
+    sh:datatype xsd:string ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:in ("PASSED" "FAILED" "PENDING") ;
+  ] ;
+  sh:property [
+    sh:path pen:checkDate ;
+    sh:datatype xsd:date ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] .
+
+pen:TaxWithholdingShape a sh:NodeShape ;
+  sh:targetClass pen:TaxWithholding ;
+  sh:property [
+    sh:path pen:withholdingForPayment ;
+    sh:class pen:Payment ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:withholdingJurisdiction ;
+    sh:class pen:TaxJurisdiction ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+  ] ;
+  sh:property [
+    sh:path pen:withholdingAmount ;
+    sh:datatype xsd:decimal ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:minInclusive 0 ;
+  ] .

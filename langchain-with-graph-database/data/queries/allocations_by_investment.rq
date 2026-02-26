@@ -1,0 +1,10 @@
+# queries/allocations_by_investment.rq
+PREFIX pen: <https://example.com/ontology/pension-insurance#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+SELECT ?inv (SUM(xsd:decimal(?amt)) AS ?allocatedTotal) WHERE {
+  ?tx a pen:Allocation ;
+      pen:allocatedToInvestmentOption ?inv ;
+      pen:transactionAmount ?amt .
+}
+GROUP BY ?inv
+ORDER BY DESC(?allocatedTotal)

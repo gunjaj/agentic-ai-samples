@@ -1,0 +1,9 @@
+# queries/beneficiaries_for_members.rq
+PREFIX pen: <https://example.com/ontology/pension-insurance#>
+SELECT ?member ?beneficiary ?share WHERE {
+  ?member a pen:Member ;
+          pen:hasBeneficiaryDesignation ?d .
+  ?d pen:designatesBeneficiary ?beneficiary .
+  OPTIONAL { ?d pen:designationShare ?share }
+}
+ORDER BY ?member

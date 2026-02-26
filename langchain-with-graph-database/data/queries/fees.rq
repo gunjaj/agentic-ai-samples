@@ -1,0 +1,11 @@
+# queries/fees.rq
+PREFIX pen: <https://example.com/ontology/pension-insurance#>
+SELECT ?acct ?feeTx ?amt ?ts ?type WHERE {
+  ?acct a pen:Account ;
+        pen:hasTransaction ?feeTx .
+  ?feeTx a pen:Fee ;
+         pen:transactionAmount ?amt ;
+         pen:transactionDateTime ?ts ;
+         pen:transactionType ?type .
+}
+ORDER BY ?ts

@@ -1,0 +1,14 @@
+# queries/members.rq
+PREFIX pen: <https://example.com/ontology/pension-insurance#>
+
+SELECT ?member ?memberId ?plan ?acct
+WHERE {
+  ?member a pen:Member ;
+          pen:enrolledInPlan ?plan ;
+          pen:hasMemberAccount ?acct ;
+          pen:hasIdentifier ?id .
+
+  ?id pen:identifierType "MEMBER_ID" ;
+      pen:identifierValue ?memberId .
+}
+ORDER BY ?memberId

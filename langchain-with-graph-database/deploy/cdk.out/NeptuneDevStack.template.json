@@ -1,0 +1,1144 @@
+{
+ "Resources": {
+  "NeptuneVPCC2F535B3": {
+   "Type": "AWS::EC2::VPC",
+   "Properties": {
+    "CidrBlock": "10.0.0.0/16",
+    "EnableDnsHostnames": true,
+    "EnableDnsSupport": true,
+    "InstanceTenancy": "default",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "NeptuneDevStack/NeptuneVPC"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/Resource"
+   }
+  },
+  "NeptuneVPCPublicSubnet1SubnetDFDB765F": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": {
+     "Fn::Select": [
+      0,
+      {
+       "Fn::GetAZs": ""
+      }
+     ]
+    },
+    "CidrBlock": "10.0.0.0/18",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Name",
+      "Value": "NeptuneDevStack/NeptuneVPC/PublicSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "NeptuneVPCC2F535B3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/PublicSubnet1/Subnet"
+   }
+  },
+  "NeptuneVPCPublicSubnet1RouteTableAFA5BBAC": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "NeptuneDevStack/NeptuneVPC/PublicSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "NeptuneVPCC2F535B3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/PublicSubnet1/RouteTable"
+   }
+  },
+  "NeptuneVPCPublicSubnet1RouteTableAssociation92E64AC6": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "NeptuneVPCPublicSubnet1RouteTableAFA5BBAC"
+    },
+    "SubnetId": {
+     "Ref": "NeptuneVPCPublicSubnet1SubnetDFDB765F"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/PublicSubnet1/RouteTableAssociation"
+   }
+  },
+  "NeptuneVPCPublicSubnet1DefaultRouteA63A0E00": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "NeptuneVPCIGWF975608C"
+    },
+    "RouteTableId": {
+     "Ref": "NeptuneVPCPublicSubnet1RouteTableAFA5BBAC"
+    }
+   },
+   "DependsOn": [
+    "NeptuneVPCVPCGW90F13E23"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/PublicSubnet1/DefaultRoute"
+   }
+  },
+  "NeptuneVPCPublicSubnet2SubnetA62B3100": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": {
+     "Fn::Select": [
+      1,
+      {
+       "Fn::GetAZs": ""
+      }
+     ]
+    },
+    "CidrBlock": "10.0.64.0/18",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Name",
+      "Value": "NeptuneDevStack/NeptuneVPC/PublicSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "NeptuneVPCC2F535B3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/PublicSubnet2/Subnet"
+   }
+  },
+  "NeptuneVPCPublicSubnet2RouteTableCCD71A47": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "NeptuneDevStack/NeptuneVPC/PublicSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "NeptuneVPCC2F535B3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/PublicSubnet2/RouteTable"
+   }
+  },
+  "NeptuneVPCPublicSubnet2RouteTableAssociation50842CE4": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "NeptuneVPCPublicSubnet2RouteTableCCD71A47"
+    },
+    "SubnetId": {
+     "Ref": "NeptuneVPCPublicSubnet2SubnetA62B3100"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/PublicSubnet2/RouteTableAssociation"
+   }
+  },
+  "NeptuneVPCPublicSubnet2DefaultRoute8974335D": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "NeptuneVPCIGWF975608C"
+    },
+    "RouteTableId": {
+     "Ref": "NeptuneVPCPublicSubnet2RouteTableCCD71A47"
+    }
+   },
+   "DependsOn": [
+    "NeptuneVPCVPCGW90F13E23"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/PublicSubnet2/DefaultRoute"
+   }
+  },
+  "NeptuneVPCIsolatedSubnet1Subnet69DFE4E7": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": {
+     "Fn::Select": [
+      0,
+      {
+       "Fn::GetAZs": ""
+      }
+     ]
+    },
+    "CidrBlock": "10.0.128.0/18",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Isolated"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Isolated"
+     },
+     {
+      "Key": "Name",
+      "Value": "NeptuneDevStack/NeptuneVPC/IsolatedSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "NeptuneVPCC2F535B3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/IsolatedSubnet1/Subnet"
+   }
+  },
+  "NeptuneVPCIsolatedSubnet1RouteTableB6FFD579": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "NeptuneDevStack/NeptuneVPC/IsolatedSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "NeptuneVPCC2F535B3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/IsolatedSubnet1/RouteTable"
+   }
+  },
+  "NeptuneVPCIsolatedSubnet1RouteTableAssociation69756742": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "NeptuneVPCIsolatedSubnet1RouteTableB6FFD579"
+    },
+    "SubnetId": {
+     "Ref": "NeptuneVPCIsolatedSubnet1Subnet69DFE4E7"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/IsolatedSubnet1/RouteTableAssociation"
+   }
+  },
+  "NeptuneVPCIsolatedSubnet2SubnetC82F2F46": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": {
+     "Fn::Select": [
+      1,
+      {
+       "Fn::GetAZs": ""
+      }
+     ]
+    },
+    "CidrBlock": "10.0.192.0/18",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Isolated"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Isolated"
+     },
+     {
+      "Key": "Name",
+      "Value": "NeptuneDevStack/NeptuneVPC/IsolatedSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "NeptuneVPCC2F535B3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/IsolatedSubnet2/Subnet"
+   }
+  },
+  "NeptuneVPCIsolatedSubnet2RouteTable0B925C0F": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "NeptuneDevStack/NeptuneVPC/IsolatedSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "NeptuneVPCC2F535B3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/IsolatedSubnet2/RouteTable"
+   }
+  },
+  "NeptuneVPCIsolatedSubnet2RouteTableAssociation518BD9BB": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "NeptuneVPCIsolatedSubnet2RouteTable0B925C0F"
+    },
+    "SubnetId": {
+     "Ref": "NeptuneVPCIsolatedSubnet2SubnetC82F2F46"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/IsolatedSubnet2/RouteTableAssociation"
+   }
+  },
+  "NeptuneVPCIGWF975608C": {
+   "Type": "AWS::EC2::InternetGateway",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "NeptuneDevStack/NeptuneVPC"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/IGW"
+   }
+  },
+  "NeptuneVPCVPCGW90F13E23": {
+   "Type": "AWS::EC2::VPCGatewayAttachment",
+   "Properties": {
+    "InternetGatewayId": {
+     "Ref": "NeptuneVPCIGWF975608C"
+    },
+    "VpcId": {
+     "Ref": "NeptuneVPCC2F535B3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneVPC/VPCGW"
+   }
+  },
+  "NeptuneSubnetGroup": {
+   "Type": "AWS::Neptune::DBSubnetGroup",
+   "Properties": {
+    "DBSubnetGroupDescription": "Neptune subnet group",
+    "SubnetIds": [
+     {
+      "Ref": "NeptuneVPCPublicSubnet1SubnetDFDB765F"
+     },
+     {
+      "Ref": "NeptuneVPCPublicSubnet2SubnetA62B3100"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneSubnetGroup"
+   }
+  },
+  "NeptuneSG31D2E08E": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "NeptuneDevStack/NeptuneSG",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "from 0.0.0.0/0:8182",
+      "FromPort": 8182,
+      "IpProtocol": "tcp",
+      "ToPort": 8182
+     }
+    ],
+    "VpcId": {
+     "Ref": "NeptuneVPCC2F535B3"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneSG/Resource"
+   }
+  },
+  "NeptuneBulkLoadBucketA28ECD26": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneBulkLoadBucket/Resource"
+   }
+  },
+  "NeptuneBulkLoadBucketPolicy8F0781AB": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "NeptuneBulkLoadBucketA28ECD26"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:PutBucketPolicy",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:DeleteObject*"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "NeptuneBulkLoadBucketA28ECD26",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "NeptuneBulkLoadBucketA28ECD26",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneBulkLoadBucket/Policy/Resource"
+   }
+  },
+  "NeptuneBulkLoadBucketAutoDeleteObjectsCustomResource7B281E48": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "NeptuneBulkLoadBucketA28ECD26"
+    }
+   },
+   "DependsOn": [
+    "NeptuneBulkLoadBucketPolicy8F0781AB"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneBulkLoadBucket/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      "Arn"
+     ]
+    },
+    "Runtime": {
+     "Fn::FindInMap": [
+      "LatestNodeRuntimeMap",
+      {
+       "Ref": "AWS::Region"
+      },
+      "value"
+     ]
+    },
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "Lambda function for auto-deleting objects in ",
+       {
+        "Ref": "NeptuneBulkLoadBucketA28ECD26"
+       },
+       " S3 bucket."
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+    "aws:asset:property": "Code"
+   }
+  },
+  "NeptuneS3Role8D81371E": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "rds.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneS3Role/Resource"
+   }
+  },
+  "NeptuneS3RoleDefaultPolicy31B36339": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:GetObject*",
+        "s3:GetBucket*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "NeptuneBulkLoadBucketA28ECD26",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "NeptuneBulkLoadBucketA28ECD26",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "NeptuneS3RoleDefaultPolicy31B36339",
+    "Roles": [
+     {
+      "Ref": "NeptuneS3Role8D81371E"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneS3Role/DefaultPolicy/Resource"
+   }
+  },
+  "NeptuneCluster": {
+   "Type": "AWS::Neptune::DBCluster",
+   "Properties": {
+    "AssociatedRoles": [
+     {
+      "RoleArn": {
+       "Fn::GetAtt": [
+        "NeptuneS3Role8D81371E",
+        "Arn"
+       ]
+      }
+     }
+    ],
+    "AvailabilityZones": [
+     {
+      "Fn::Select": [
+       0,
+       {
+        "Fn::GetAZs": ""
+       }
+      ]
+     }
+    ],
+    "DBClusterIdentifier": "db-neptune-1",
+    "DBSubnetGroupName": {
+     "Ref": "NeptuneSubnetGroup"
+    },
+    "DeletionProtection": false,
+    "EngineVersion": "1.4.6.2",
+    "IamAuthEnabled": true,
+    "ServerlessScalingConfiguration": {
+     "MaxCapacity": 10,
+     "MinCapacity": 1
+    },
+    "StorageEncrypted": false,
+    "VpcSecurityGroupIds": [
+     {
+      "Fn::GetAtt": [
+       "NeptuneSG31D2E08E",
+       "GroupId"
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneCluster"
+   }
+  },
+  "NeptuneInstance": {
+   "Type": "AWS::Neptune::DBInstance",
+   "Properties": {
+    "DBClusterIdentifier": {
+     "Ref": "NeptuneCluster"
+    },
+    "DBInstanceClass": "db.serverless",
+    "DBInstanceIdentifier": "db-neptune-1-instance-1"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/NeptuneInstance"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/11RQW7DIBB8S++Epk4/EDtSlEMlZFe5VphsE2obLFgSWch/7zZYIeppZ4ZhZxcKXhRrvn6RN79Sp27V65bHBqXqGElfEVTB43FUrPo2R1ExEdpeqya0BvBPy6i2AeFTtj1kPWtb763SErU1DzMTTl8lQu5xMAiO8J7Um5yW0IVtkca6DGCQNaCC0zjtnQ3jPe5ZmJmBEYMBHuloV6b+D++urPrgKSiRg/EojYKZ+Q2PZVBdmmVBqQhLW09ZTnxmWg481jbtfK/ZuXhmVoO3wSnyUKwdMqUrT/hDjqM2538u4exVn8CV0gOjVwSk3zmTb2Ziwos1rxv+9k4/+OO1XrlgUA/A61R/AQeAP4beAQAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "NeptuneDevStack/CDKMetadata/Default"
+   },
+   "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Mappings": {
+  "LatestNodeRuntimeMap": {
+   "af-south-1": {
+    "value": "nodejs22.x"
+   },
+   "ap-east-1": {
+    "value": "nodejs22.x"
+   },
+   "ap-east-2": {
+    "value": "nodejs22.x"
+   },
+   "ap-northeast-1": {
+    "value": "nodejs22.x"
+   },
+   "ap-northeast-2": {
+    "value": "nodejs22.x"
+   },
+   "ap-northeast-3": {
+    "value": "nodejs22.x"
+   },
+   "ap-south-1": {
+    "value": "nodejs22.x"
+   },
+   "ap-south-2": {
+    "value": "nodejs22.x"
+   },
+   "ap-southeast-1": {
+    "value": "nodejs22.x"
+   },
+   "ap-southeast-2": {
+    "value": "nodejs22.x"
+   },
+   "ap-southeast-3": {
+    "value": "nodejs22.x"
+   },
+   "ap-southeast-4": {
+    "value": "nodejs22.x"
+   },
+   "ap-southeast-5": {
+    "value": "nodejs22.x"
+   },
+   "ap-southeast-6": {
+    "value": "nodejs22.x"
+   },
+   "ap-southeast-7": {
+    "value": "nodejs22.x"
+   },
+   "ca-central-1": {
+    "value": "nodejs22.x"
+   },
+   "ca-west-1": {
+    "value": "nodejs22.x"
+   },
+   "cn-north-1": {
+    "value": "nodejs22.x"
+   },
+   "cn-northwest-1": {
+    "value": "nodejs22.x"
+   },
+   "eu-central-1": {
+    "value": "nodejs22.x"
+   },
+   "eu-central-2": {
+    "value": "nodejs22.x"
+   },
+   "eu-isoe-west-1": {
+    "value": "nodejs22.x"
+   },
+   "eu-north-1": {
+    "value": "nodejs22.x"
+   },
+   "eu-south-1": {
+    "value": "nodejs22.x"
+   },
+   "eu-south-2": {
+    "value": "nodejs22.x"
+   },
+   "eu-west-1": {
+    "value": "nodejs22.x"
+   },
+   "eu-west-2": {
+    "value": "nodejs22.x"
+   },
+   "eu-west-3": {
+    "value": "nodejs22.x"
+   },
+   "eusc-de-east-1": {
+    "value": "nodejs22.x"
+   },
+   "il-central-1": {
+    "value": "nodejs22.x"
+   },
+   "me-central-1": {
+    "value": "nodejs22.x"
+   },
+   "me-south-1": {
+    "value": "nodejs22.x"
+   },
+   "mx-central-1": {
+    "value": "nodejs22.x"
+   },
+   "sa-east-1": {
+    "value": "nodejs22.x"
+   },
+   "us-east-1": {
+    "value": "nodejs22.x"
+   },
+   "us-east-2": {
+    "value": "nodejs22.x"
+   },
+   "us-gov-east-1": {
+    "value": "nodejs22.x"
+   },
+   "us-gov-west-1": {
+    "value": "nodejs22.x"
+   },
+   "us-iso-east-1": {
+    "value": "nodejs22.x"
+   },
+   "us-iso-west-1": {
+    "value": "nodejs22.x"
+   },
+   "us-isob-east-1": {
+    "value": "nodejs18.x"
+   },
+   "us-isob-west-1": {
+    "value": "nodejs18.x"
+   },
+   "us-isof-east-1": {
+    "value": "nodejs22.x"
+   },
+   "us-isof-south-1": {
+    "value": "nodejs22.x"
+   },
+   "us-west-1": {
+    "value": "nodejs22.x"
+   },
+   "us-west-2": {
+    "value": "nodejs22.x"
+   }
+  }
+ },
+ "Conditions": {
+  "CDKMetadataAvailable": {
+   "Fn::Or": [
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "af-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-northeast-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-south-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-3"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ap-southeast-4"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "ca-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "cn-northwest-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-central-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-north-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-south-2"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Or": [
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "eu-west-3"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "il-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-central-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "me-south-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "sa-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-1"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-east-2"
+       ]
+      },
+      {
+       "Fn::Equals": [
+        {
+         "Ref": "AWS::Region"
+        },
+        "us-west-1"
+       ]
+      }
+     ]
+    },
+    {
+     "Fn::Equals": [
+      {
+       "Ref": "AWS::Region"
+      },
+      "us-west-2"
+     ]
+    }
+   ]
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}
